@@ -1,0 +1,15 @@
+/**
+ * PromptVault content-script stylesheet.
+ *
+ * Almost all overlay/modal/toast styling lives inside the shadow DOM
+ * (see UI_STYLES in content.js) so it can never leak into, or be
+ * clobbered by, the host page's CSS. This file only has to guarantee
+ * that our shadow-DOM host element itself behaves predictably no
+ * matter how aggressive the page's global CSS rules are (e.g. sites
+ * that do `div { all: unset }` or set huge default z-index stacks).
+ */
+#promptvault-ui-host {
+  all: initial !important;
+  position: static !important;
+  display: contents !important;
+}

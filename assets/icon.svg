@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="pv-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#8B5CF6" />
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="128" height="128" rx="26" fill="url(#pv-grad)" />
+  <path d="M41 26 H87 A2 2 0 0 1 89 28 V96 L64 82 L39 96 V28 A2 2 0 0 1 41 26 Z" fill="#ffffff" />
+</svg>

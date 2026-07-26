@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:;" />
+    <title>PromptVault</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="app" id="app">
+      <!-- ===== List view ===== -->
+      <section id="view-list" class="view">
+        <header class="topbar">
+          <div class="brand">
+            <span class="brand-mark" aria-hidden="true">PV</span>
+            <span class="brand-name">PromptVault</span>
+          </div>
+          <div class="topbar-actions">
+            <button id="btn-manage" class="icon-btn" type="button" title="Open manage page" aria-label="Open manage page">⚙</button>
+            <button id="btn-add" class="icon-btn icon-btn-accent" type="button" title="Add snippet" aria-label="Add snippet">+</button>
+          </div>
+        </header>
+
+        <div class="search-row">
+          <input id="search-input" type="text" placeholder="Search snippets…" aria-label="Search snippets" autocomplete="off" />
+        </div>
+
+        <div id="pro-banner" class="pro-banner hidden">
+          <span class="pro-banner-text">You're on the free plan.</span>
+          <button id="btn-upgrade-banner" class="link-btn" type="button">Upgrade to Pro</button>
+        </div>
+
+        <div id="snippet-list" class="snippet-list" role="listbox" aria-label="Snippets"></div>
+
+        <div id="empty-state" class="empty-state hidden">
+          <p>No snippets yet.</p>
+          <button id="btn-add-empty" class="btn btn-primary" type="button">Create your first snippet</button>
+        </div>
+
+        <footer class="footer">
+          <span id="usage-text" class="usage-text"></span>
+          <span class="footer-hint"><kbd>Ctrl/Cmd+Shift+Space</kbd> quick search anywhere</span>
+        </footer>
+      </section>
+
+      <!-- ===== Edit / Add view ===== -->
+      <section id="view-edit" class="view hidden">
+        <header class="topbar">
+          <button id="btn-back" class="icon-btn" type="button" aria-label="Back">←</button>
+          <div class="brand"><span id="edit-title" class="edit-title">New snippet</span></div>
+          <div class="topbar-actions"></div>
+        </header>
+
+        <form id="snippet-form" class="form">
+          <label class="field">
+            <span class="field-label">Title</span>
+            <input id="f-title" type="text" required maxlength="120" placeholder="e.g. Fix a bug" />
+          </label>
+
+          <label class="field">
+            <span class="field-label">Folder</span>
+            <select id="f-folder"></select>
+          </label>
+
+          <label class="field">
+            <span class="field-label">Body</span>
+            <textarea id="f-body" required rows="6" placeholder="Write your prompt. Use {{variable}} for fill-in-the-blank placeholders."></textarea>
+          </label>
+          <p id="var-hint" class="hint hidden">
+            Template variables are a <strong>Pro</strong> feature — this snippet will insert with the
+            <code>{{placeholders}}</code> left as literal text until you upgrade.
+          </p>
+
+          <label class="field">
+            <span class="field-label">Tags <span class="field-note">(comma-separated)</span></span>
+            <input id="f-tags" type="text" placeholder="e.g. email, work" />
+          </label>
+
+          <label class="field">
+            <span class="field-label">
+              Trigger <span class="field-note">(type this anywhere to auto-expand)</span>
+              <span id="trigger-pro-badge" class="pro-badge hidden">PRO</span>
+            </span>
+            <input id="f-trigger" type="text" placeholder=";mytrigger" />
+          </label>
+          <p id="trigger-hint" class="hint hidden">
+            Custom typed triggers require <strong>Pro</strong>. Quick-search (<kbd>Ctrl/Cmd+Shift+Space</kbd>) still works on the free plan.
+          </p>
+
+          <div class="form-actions">
+            <button id="btn-delete" type="button" class="btn btn-danger hidden">Delete</button>
+            <span class="spacer"></span>
+            <button id="btn-cancel" type="button" class="btn btn-secondary">Cancel</button>
+            <button id="btn-save" type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ===== Limit-reached view ===== -->
+      <section id="view-limit" class="view hidden">
+        <div class="limit-panel">
+          <h2>Free plan limit reached</h2>
+          <p>You've saved the maximum of <strong id="limit-max">25</strong> snippets on the free plan.</p>
+          <p class="hint">Upgrade to Pro for unlimited snippets, template variables, custom triggers, and import/export.</p>
+          <div class="form-actions">
+            <button id="btn-limit-back" type="button" class="btn btn-secondary">Back</button>
+            <button id="btn-limit-upgrade" type="button" class="btn btn-primary">Upgrade to Pro</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script src="js/store.js"></script>
+    <script src="js/limits.js"></script>
+    <script src="js/pro.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

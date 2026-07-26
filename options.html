@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:;" />
+    <title>PromptVault — Manage</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <header class="header">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">PV</span>
+          <div>
+            <div class="brand-name">PromptVault</div>
+            <div class="brand-sub">Manage your snippets, folders &amp; settings</div>
+          </div>
+        </div>
+        <nav class="tabs" role="tablist" aria-label="Sections">
+          <button class="tab-btn" data-tab="snippets" role="tab" aria-selected="true">Snippets</button>
+          <button class="tab-btn" data-tab="data" role="tab" aria-selected="false">Import &amp; Export</button>
+          <button class="tab-btn" data-tab="settings" role="tab" aria-selected="false">Settings</button>
+          <button class="tab-btn tab-btn-pro" data-tab="pro" role="tab" aria-selected="false">✨ Pro</button>
+        </nav>
+      </header>
+
+      <!-- ===================== Snippets tab ===================== -->
+      <main id="tab-snippets" class="tab-panel">
+        <aside class="sidebar">
+          <div class="sidebar-header">
+            <span>Folders</span>
+            <button id="btn-new-folder" class="tiny-btn" type="button">+ New</button>
+          </div>
+          <ul id="folder-list" class="folder-list"></ul>
+        </aside>
+
+        <section class="content">
+          <div class="content-toolbar">
+            <input id="search-input" type="text" placeholder="Search title, body, tags, or trigger…" aria-label="Search snippets" />
+            <button id="btn-new-snippet" class="btn btn-primary" type="button">+ New snippet</button>
+          </div>
+          <div id="usage-banner" class="usage-banner"></div>
+          <div id="snippet-table-wrap">
+            <table class="snippet-table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Folder</th>
+                  <th>Tags</th>
+                  <th>Trigger</th>
+                  <th>Updated</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="snippet-tbody"></tbody>
+            </table>
+            <div id="snippet-empty" class="empty-state hidden">No snippets match.</div>
+          </div>
+        </section>
+      </main>
+
+      <!-- ===================== Import & Export tab ===================== -->
+      <main id="tab-data" class="tab-panel hidden">
+        <section class="content content-solo">
+          <h2>Import &amp; Export</h2>
+          <p class="muted">Back up your folders and snippets as a JSON file, or restore from one.</p>
+
+          <div id="data-locked" class="upgrade-card hidden">
+            <h3>Import / Export is a Pro feature</h3>
+            <p>Upgrade to Pro to back up and restore your PromptVault data as JSON.</p>
+            <button id="btn-data-upgrade" class="btn btn-primary" type="button">Upgrade to Pro</button>
+          </div>
+
+          <div id="data-unlocked" class="data-actions">
+            <div class="data-card">
+              <h3>Export</h3>
+              <p class="muted">Download all folders and snippets as a JSON file.</p>
+              <button id="btn-export" class="btn btn-secondary" type="button">Export JSON</button>
+            </div>
+            <div class="data-card">
+              <h3>Import</h3>
+              <p class="muted">Choose a PromptVault JSON export to merge into your library.</p>
+              <input id="import-file" type="file" accept="application/json" />
+              <div class="import-mode">
+                <label><input type="radio" name="import-mode" value="merge" checked /> Merge with existing</label>
+                <label><input type="radio" name="import-mode" value="replace" /> Replace everything</label>
+              </div>
+              <button id="btn-import" class="btn btn-secondary" type="button" disabled>Import JSON</button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- ===================== Settings tab ===================== -->
+      <main id="tab-settings" class="tab-panel hidden">
+        <section class="content content-solo">
+          <h2>Settings</h2>
+
+          <div class="setting-row">
+            <div>
+              <div class="setting-title">Theme</div>
+              <div class="muted">Follows your system by default.</div>
+            </div>
+            <select id="theme-select">
+              <option value="system">System</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+
+          <div class="setting-row">
+            <div>
+              <div class="setting-title">Keyboard shortcut</div>
+              <div class="muted">Open the quick-search overlay from any page.</div>
+            </div>
+            <button id="btn-open-shortcuts" class="btn btn-secondary" type="button">Edit shortcut</button>
+          </div>
+
+          <div class="setting-row setting-row-danger">
+            <div>
+              <div class="setting-title">Reset all data</div>
+              <div class="muted">Deletes every folder and snippet. This cannot be undone.</div>
+            </div>
+            <button id="btn-reset" class="btn btn-danger" type="button">Reset PromptVault</button>
+          </div>
+        </section>
+      </main>
+
+      <!-- ===================== Pro tab ===================== -->
+      <main id="tab-pro" class="tab-panel hidden">
+        <section class="content content-solo">
+          <div class="pro-hero">
+            <h2>PromptVault Pro</h2>
+            <p class="muted">Unlock the full toolkit for power users.</p>
+          </div>
+
+          <ul class="pro-feature-list">
+            <li><strong>Unlimited snippets</strong> — free plan is capped at 25.</li>
+            <li><strong>Template variables</strong> — fill in <code>{{placeholders}}</code> with a quick form on insert.</li>
+            <li><strong>Custom typed triggers</strong> — type <code>;yourtrigger</code> anywhere to auto-expand.</li>
+            <li><strong>JSON import / export</strong> — back up and migrate your library.</li>
+            <li><strong>Cloud sync</strong> — coming soon, across all your devices.</li>
+          </ul>
+
+          <div id="pro-status-card" class="pro-status-card"></div>
+
+          <button id="btn-upgrade-main" class="btn btn-primary btn-large" type="button">Upgrade to Pro</button>
+
+          <details class="dev-toggle">
+            <summary>Developer options (testing only)</summary>
+            <p class="muted">
+              Pro billing isn't wired up yet — see the TODO block in <code>js/pro.js</code> for the
+              planned ExtensionPay integration. Until then, use this switch to test Pro-gated UI locally.
+            </p>
+            <label class="dev-switch">
+              <input type="checkbox" id="dev-pro-toggle" />
+              Enable Pro locally (dev only)
+            </label>
+          </details>
+        </section>
+      </main>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <!-- Snippet edit dialog -->
+    <div id="edit-dialog" class="dialog-backdrop hidden">
+      <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+        <div class="dialog-header">
+          <span id="dialog-title">New snippet</span>
+          <button id="dialog-close" class="icon-btn" type="button" aria-label="Close">✕</button>
+        </div>
+        <form id="snippet-form" class="dialog-form">
+          <label class="field">
+            <span class="field-label">Title</span>
+            <input id="f-title" type="text" required maxlength="120" />
+          </label>
+          <div class="field-row">
+            <label class="field">
+              <span class="field-label">Folder</span>
+              <select id="f-folder"></select>
+            </label>
+            <label class="field">
+              <span class="field-label">Tags <span class="field-note">(comma-separated)</span></span>
+              <input id="f-tags" type="text" placeholder="e.g. email, work" />
+            </label>
+          </div>
+          <label class="field">
+            <span class="field-label">Body</span>
+            <textarea id="f-body" required rows="10" placeholder="Write your prompt. Use {{variable}} for fill-in-the-blank placeholders."></textarea>
+          </label>
+          <p id="var-hint" class="hint hidden">
+            Template variables are a <strong>Pro</strong> feature — this snippet will insert with the
+            <code>{{placeholders}}</code> left as literal text until you upgrade.
+          </p>
+          <label class="field">
+            <span class="field-label">
+              Trigger <span class="field-note">(type this anywhere to auto-expand)</span>
+              <span id="trigger-pro-badge" class="pro-badge hidden">PRO</span>
+            </span>
+            <input id="f-trigger" type="text" placeholder=";mytrigger" />
+          </label>
+          <p id="trigger-hint" class="hint hidden">
+            Custom typed triggers require <strong>Pro</strong>. Quick-search still works on the free plan.
+          </p>
+          <div class="dialog-actions">
+            <button id="btn-delete" type="button" class="btn btn-danger hidden">Delete</button>
+            <span class="spacer"></span>
+            <button id="btn-cancel" type="button" class="btn btn-secondary">Cancel</button>
+            <button id="btn-save" type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Limit reached dialog -->
+    <div id="limit-dialog" class="dialog-backdrop hidden">
+      <div class="dialog dialog-small" role="dialog" aria-modal="true">
+        <div class="dialog-header"><span>Free plan limit reached</span></div>
+        <div class="dialog-form">
+          <p>You've saved the maximum of <strong id="limit-max">25</strong> snippets on the free plan.</p>
+          <p class="muted">Upgrade to Pro for unlimited snippets, template variables, custom triggers, and import/export.</p>
+          <div class="dialog-actions">
+            <span class="spacer"></span>
+            <button id="btn-limit-close" type="button" class="btn btn-secondary">Close</button>
+            <button id="btn-limit-upgrade" type="button" class="btn btn-primary">Upgrade to Pro</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/store.js"></script>
+    <script src="js/limits.js"></script>
+    <script src="js/pro.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>
