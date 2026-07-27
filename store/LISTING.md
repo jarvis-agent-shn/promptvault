@@ -26,21 +26,25 @@ support tools, forms. Works with normal inputs, textareas, and rich editors.
 Add {{variables}} to a snippet (like {{topic}} or {{tone}}) and PromptVault asks
 you to fill them in as you insert — so one template covers dozens of situations.
 
-★ Typed triggers
-Give a snippet a trigger like ;fix or ;email and expand it inline as you type.
+★ Quick-search shortcuts
+Give a snippet a short trigger like ;fix or ;email and jump straight to it from
+the quick-search overlay.
 
 ★ Private by design
 Everything is stored locally on your device. No accounts, no tracking, no servers,
 no data leaves your computer. Export or import your library as JSON any time.
 
 Free plan: up to 25 snippets, folders, search, and quick-insert.
-Pro (coming soon): unlimited snippets, template variables, custom triggers,
-import/export, and cloud sync.
+Pro (coming soon): unlimited snippets, template variables, custom quick-search
+shortcuts, import/export, and cloud sync.
 
 **Permission justifications (for reviewer):**
 - storage: persist the user's snippets/settings locally.
 - activeTab + scripting: insert a chosen snippet into the text field on the page
-  the user is actively using, only on user action. No background page reading.
+  the user is actively using, only on user action (keyboard shortcut or a popup
+  click). No content script, no host_permissions, no background page reading —
+  the extension injects its UI into the active tab on demand and only in direct
+  response to that user action.
 
 **Privacy policy URL:** https://github.com/jarvis-agent-shn/promptvault/blob/main/store/PRIVACY.md
 

@@ -1,12 +1,15 @@
 /**
- * PromptVault content-script stylesheet.
+ * PromptVault on-demand UI stylesheet.
  *
- * Almost all overlay/modal/toast styling lives inside the shadow DOM
- * (see UI_STYLES in content.js) so it can never leak into, or be
- * clobbered by, the host page's CSS. This file only has to guarantee
- * that our shadow-DOM host element itself behaves predictably no
- * matter how aggressive the page's global CSS rules are (e.g. sites
- * that do `div { all: unset }` or set huge default z-index stacks).
+ * Injected on demand via chrome.scripting.insertCSS (see background.js
+ * injectAndMessage()) alongside content.js — never a standing
+ * content-script stylesheet. Almost all overlay/modal/toast styling
+ * lives inside the shadow DOM (see UI_STYLES in content.js) so it can
+ * never leak into, or be clobbered by, the host page's CSS. This file
+ * only has to guarantee that our shadow-DOM host element itself
+ * behaves predictably no matter how aggressive the page's global CSS
+ * rules are (e.g. sites that do `div { all: unset }` or set huge
+ * default z-index stacks).
  */
 #promptvault-ui-host {
   all: initial !important;

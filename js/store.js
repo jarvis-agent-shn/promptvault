@@ -2,9 +2,9 @@
  * PromptVault data layer.
  *
  * Plain script (NOT an ES module) so it can be loaded via <script src>,
- * chrome.scripting content scripts, and importScripts() from the
- * background service worker, all sharing the same global namespace:
- * `globalThis.PVStore`.
+ * on-demand injection via chrome.scripting.executeScript, and
+ * importScripts() from the background service worker, all sharing the
+ * same global namespace: `globalThis.PVStore`.
  *
  * Storage shape (chrome.storage.local):
  *   pv_folders:  Folder[]

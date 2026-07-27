@@ -29,8 +29,8 @@ Fill the tabs below, then click **Submit for review**. (Future package updates a
 - **Permission justifications:**
   - storage: Stores the user's snippets, folders, and settings locally on their device.
   - activeTab: Inserts a chosen snippet into the text field of the tab the user is actively using, only when the user triggers an insertion.
-  - scripting: Injects the insertion logic into the active tab on user command to place the chosen snippet into the focused text field.
-  - Host permissions (all sites): The content script must run on all sites so users can insert their saved snippets into a text field on whatever website they're using (AI chat tools, email, forms, etc.). It acts only on user command and does not read page content in the background.
+  - scripting: Injects the insertion UI/logic into the active tab, only on user command (keyboard shortcut or popup click), to place the chosen snippet into the focused text field.
+  - NOTE: v0.2.0 uses NO host_permissions and NO content script — access is limited to the active tab at the moment you invoke the extension (activeTab). This avoids the broad-permission review delay and the scary install warning.
 - **Are you using remote code?** No, I am not using remote code.
 - **Data usage:** Do NOT check any data-collection categories (the extension collects nothing). Then check the two certification boxes affirming compliance with the Developer Program Policies and that you don't sell data.
 - **Privacy policy URL:**

@@ -3,8 +3,10 @@
  * free vs. Pro users can do. Exposed as `globalThis.PVLimits`.
  *
  * Depends on PVPro (js/pro.js) and PVStore (js/store.js) being loaded
- * first in every context that uses this file (background, content,
- * popup, options — see manifest.json / <script> ordering).
+ * first in every context that uses this file: the background service
+ * worker (importScripts) and the popup/options pages (<script src>).
+ * The on-demand injected page UI (content.js) does not need snippet
+ * limits, so it isn't loaded there.
  */
 (function (global) {
   "use strict";
@@ -20,9 +22,9 @@
   const UPGRADE_COPY = {
     title: "Upgrade to PromptVault Pro",
     body:
-      "Pro unlocks unlimited snippets, {{template}} variables, custom typed " +
-      "triggers, JSON import/export, and (coming soon) cloud sync across " +
-      "devices.",
+      "Pro unlocks unlimited snippets, {{template}} variables, custom " +
+      "quick-search shortcuts, JSON import/export, and (coming soon) cloud " +
+      "sync across devices.",
   };
 
   async function getSnippetLimitStatus() {

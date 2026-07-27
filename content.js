@@ -1,18 +1,33 @@
 /**
- * PromptVault content script.
+ * PromptVault on-demand page UI.
  *
+ * This file is NOT a persistent content script — it isn't listed in
+ * manifest.json at all. It only ever runs because background.js
+ * programmatically injected it via chrome.scripting.executeScript, in
+ * direct response to a user action against the extension itself (the
+ * "open-quick-search" keyboard command, or a snippet click in the
+ * popup). Each of those actions grants the extension temporary
+ * activeTab access to the current tab, which is what makes the
+ * injection possible — PromptVault never runs on a page the user
+ * hasn't just explicitly invoked it on, and never requests
+ * host_permissions or a `<all_urls>` content script.
+ *
+ * Responsibilities, once injected:
  * - Tracks the last-focused editable field (input / textarea / contenteditable).
- * - Renders a shadow-DOM quick-search overlay (Ctrl/Cmd+Shift+Space) for
- *   picking a snippet and inserting it at the cursor.
- * - Watches typed input for ";trigger"-style strings and expands them
- *   inline (Pro feature; quick-search stays free).
+ * - Renders a shadow-DOM quick-search overlay (opened on request) for
+ *   picking a snippet and inserting it at the cursor. Typing a
+ *   snippet's "trigger" string in the overlay's search box filters
+ *   straight to it (see js/store.js `search`) — there is no always-on,
+ *   type-anywhere expansion; that would require a persistent
+ *   all-sites content script, which this extension deliberately does
+ *   not ship.
  * - Performs robust text insertion into <input>, <textarea>, and
  *   contenteditable elements, including React/Vue-controlled fields.
  *
- * Runs only in the top-level frame (see manifest.json — all_frames is
- * not set), which covers the compose boxes on every major AI chat
- * product, Gmail, and GitHub. Text fields inside cross-origin iframes
- * are a known limitation (documented in README.md).
+ * Runs only in the top-level frame it was injected into (executeScript
+ * defaults to the main frame), which covers the compose boxes on every
+ * major AI chat product, Gmail, and GitHub. Text fields inside
+ * cross-origin iframes are a known limitation (documented in README.md).
  */
 (function () {
   "use strict";
@@ -179,142 +194,15 @@
   });
 
   // ---------------------------------------------------------------------
-  // Caret-relative helpers used by both trigger expansion + insertion
-  // ---------------------------------------------------------------------
-
-  function getTrailingWord(text) {
-    const m = /(\S+)$/.exec(text || "");
-    return m ? m[1] : "";
-  }
-
-  /** Returns { start, end } offsets into el.value for a trailing word of
-   *  the given length, ending at the current caret. Standard fields only. */
-  function standardTriggerRange(el, wordLen) {
-    const caret = el.selectionEnd;
-    if (caret == null) return null;
-    return { start: Math.max(0, caret - wordLen), end: caret };
-  }
-
-  /** Returns a Range covering the trailing word of the given length in a
-   *  contenteditable field's current text node, ending at the caret. */
-  function ceTriggerRange(wordLen) {
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0 || !sel.isCollapsed) return null;
-    const r = sel.getRangeAt(0);
-    const node = r.startContainer;
-    if (node.nodeType !== Node.TEXT_NODE) return null;
-    const offset = r.startOffset;
-    if (offset < wordLen) return null;
-    const range = document.createRange();
-    range.setStart(node, offset - wordLen);
-    range.setEnd(node, offset);
-    return range;
-  }
-
-  // ---------------------------------------------------------------------
-  // Typed-trigger expansion (Pro only — quick-search stays free)
-  // ---------------------------------------------------------------------
-
-  let cache = { pro: false, snippets: [], loadedAt: 0 };
-
-  async function refreshCache(force) {
-    const now = Date.now();
-    if (!force && now - cache.loadedAt < 2000) return cache;
-    try {
-      const [isPro, snippets] = await Promise.all([pro.isPro(), store.getSnippets()]);
-      cache = { pro: isPro, snippets, loadedAt: now };
-    } catch (err) {
-      /* extension context may be reloading; ignore */
-    }
-    return cache;
-  }
-
-  chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === "local") refreshCache(true);
-  });
-
-  let suppressNextInput = false;
-
-  async function handleInput(e) {
-    if (suppressNextInput) return;
-    const el = e.target;
-    if (withinUi(el) || !isEditableElement(el)) return;
-
-    const { pro: isPro, snippets } = await refreshCache();
-    if (!isPro) return; // custom typed triggers are a Pro feature
-
-    const triggerable = snippets.filter((s) => s.trigger && s.trigger.trim());
-    if (!triggerable.length) return;
-
-    let word = "";
-    if (isStandardField(el)) {
-      word = getTrailingWord(el.value.slice(0, el.selectionEnd || 0));
-    } else if (isContentEditableField(el)) {
-      const sel = window.getSelection();
-      if (!sel || sel.rangeCount === 0 || !sel.isCollapsed) return;
-      const node = sel.getRangeAt(0).startContainer;
-      if (node.nodeType !== Node.TEXT_NODE) return;
-      word = getTrailingWord(node.textContent.slice(0, sel.getRangeAt(0).startOffset));
-    } else {
-      return;
-    }
-    if (!word) return;
-
-    const match = triggerable.find((s) => s.trigger === word);
-    if (!match) return;
-
-    if (isStandardField(el)) {
-      const range = standardTriggerRange(el, word.length);
-      if (!range) return;
-      expandInStandardField(el, range.start, range.end, match);
-    } else {
-      const range = ceTriggerRange(word.length);
-      if (!range) return;
-      expandInContentEditable(el, range, match);
-    }
-  }
-
-  document.addEventListener("input", (e) => {
-    handleInput(e).catch(() => {});
-  });
-
-  function expandInStandardField(el, start, end, snippet) {
-    const vars = store.extractVariables(snippet.body);
-    suppressNextInput = true;
-    insertIntoStandardField(el, "", start, end); // remove the trigger text
-    suppressNextInput = false;
-    const caretPos = start;
-    if (!vars.length) {
-      insertIntoStandardField(el, snippet.body, caretPos, caretPos);
-      showToast(`Inserted "${snippet.title}"`);
-      return;
-    }
-    openVariableModal(snippet, {
-      onSubmit: (filled) => insertIntoStandardField(el, filled, caretPos, caretPos),
-      onCancel: () => insertIntoStandardField(el, snippet.trigger, caretPos, caretPos),
-    });
-  }
-
-  function expandInContentEditable(el, range, snippet) {
-    const vars = store.extractVariables(snippet.body);
-    suppressNextInput = true;
-    insertIntoContentEditable(el, "", range); // remove the trigger text
-    suppressNextInput = false;
-    const sel = window.getSelection();
-    const collapsedRange = sel.rangeCount ? sel.getRangeAt(0).cloneRange() : null;
-    if (!vars.length) {
-      insertIntoContentEditable(el, snippet.body, collapsedRange);
-      showToast(`Inserted "${snippet.title}"`);
-      return;
-    }
-    openVariableModal(snippet, {
-      onSubmit: (filled) => insertIntoContentEditable(el, filled, collapsedRange),
-      onCancel: () => insertIntoContentEditable(el, snippet.trigger, collapsedRange),
-    });
-  }
-
-  // ---------------------------------------------------------------------
   // Shadow-DOM UI host (overlay + variable modal + toast)
+  //
+  // Note: there is no typed-trigger auto-expansion here. That would
+  // require watching every keystroke on every page via a persistent,
+  // all-sites content script — exactly what this extension gives up to
+  // avoid the broad host-permission warning. A snippet's "trigger"
+  // string still matters: it's indexed by js/store.js's search(), so
+  // typing it into the quick-search box below (e.g. ";fix") instantly
+  // filters down to that snippet.
   // ---------------------------------------------------------------------
 
   let uiHost = null;
@@ -451,7 +339,7 @@
   }
 
   // ---------------------------------------------------------------------
-  // Variable-fill modal (shared by trigger-expansion and quick-search)
+  // Variable-fill modal (used when inserting a snippet from quick-search)
   // ---------------------------------------------------------------------
 
   function openVariableModal(snippet, { onSubmit, onCancel }) {
