@@ -8,7 +8,7 @@ Fill the tabs below, then click **Submit for review**. (Future package updates a
 - **Language:** English (United States)
 - **Category:** Productivity
 - **Store icon:** upload `icon128.png` (128×128)
-- **Screenshots:** upload `1-hero.png` and `2-manage.png` (1280×800)
+- **Screenshots:** upload `1-hero.png`, `2-manage.png`, and `3-features.png` (1280×800)
 - **Small promo tile (optional):** upload `promo-440x280.png`
 - **Summary (short):**
   Save your best AI prompts & text snippets once. Insert them into any text box on any site with a keyboard shortcut.
