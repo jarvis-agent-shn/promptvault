@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "PromptVault — AI Prompt & Snippet Manager",
+  "name": "PromptVault \u2014 AI Prompt & Snippet Manager",
   "short_name": "PromptVault",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Save, organize, and instantly insert reusable text snippets and AI prompts into any input field on any website.",
   "icons": {
     "16": "icons/icon16.png",
@@ -37,6 +37,10 @@
       }
     }
   },
-  "permissions": ["storage", "activeTab", "scripting"],
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
   "minimum_chrome_version": "100"
 }
