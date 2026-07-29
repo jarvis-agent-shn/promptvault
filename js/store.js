@@ -302,69 +302,52 @@
 
     const writingId = genId();
     const codingId = genId();
+    const everydayId = genId();
     const ts = nowIso();
 
     const seedFolders = [
       { id: writingId, name: "Writing", createdAt: ts },
       { id: codingId, name: "Coding", createdAt: ts },
+      { id: everydayId, name: "Everyday", createdAt: ts },
     ];
 
+    // Starter library — usable on the free plan out of the box (no template
+    // variables required). One optional {{tone}} example shows off Pro templating.
+    const mk = (folderId, title, body, tags, trigger) => ({
+      id: genId(), folderId, title, body, tags, trigger, createdAt: ts, updatedAt: ts,
+    });
+
     const seedSnippets = [
-      {
-        id: genId(),
-        folderId: writingId,
-        title: "Polish this text",
-        body:
-          "Please improve the clarity, grammar, and flow of the following text while keeping its original meaning and tone:\n\n{{text}}",
-        tags: ["editing", "writing"],
-        trigger: ";polish",
-        createdAt: ts,
-        updatedAt: ts,
-      },
-      {
-        id: genId(),
-        folderId: writingId,
-        title: "Summarize",
-        body:
-          "Summarize the following in {{length}} bullet points, focused on the key takeaways:\n\n{{text}}",
-        tags: ["summary"],
-        trigger: ";sum",
-        createdAt: ts,
-        updatedAt: ts,
-      },
-      {
-        id: genId(),
-        folderId: writingId,
-        title: "Professional email reply",
-        body:
-          "Write a polite, professional email reply to the message below. Tone: {{tone}}.\n\nOriginal message:\n{{text}}",
-        tags: ["email"],
-        trigger: ";email",
-        createdAt: ts,
-        updatedAt: ts,
-      },
-      {
-        id: genId(),
-        folderId: codingId,
-        title: "Explain this code",
-        body:
-          "Explain what the following code does, step by step, as if teaching a junior developer:\n\n```\n{{code}}\n```",
-        tags: ["explain", "code review"],
-        trigger: ";explain",
-        createdAt: ts,
-        updatedAt: ts,
-      },
-      {
-        id: genId(),
-        folderId: codingId,
-        title: "Fix this bug",
-        body:
-          "The following code has a bug: {{issue}}. Identify the root cause and provide a corrected version with a brief explanation:\n\n```\n{{code}}\n```",
-        tags: ["debugging"],
-        trigger: ";fix",
-        createdAt: ts,
-        updatedAt: ts,
-      },
+      mk(writingId, "Fix grammar & spelling",
+        "Proofread the text below and fix any spelling and grammar mistakes. Return only the corrected version.",
+        ["editing", "writing"], ";fix"),
+      mk(writingId, "Make it concise",
+        "Rewrite the following to be as clear and concise as possible, without losing the meaning.",
+        ["editing"], ";concise"),
+      mk(writingId, "Improve my writing",
+        "Improve the clarity, flow, and tone of the text below while keeping its original meaning.",
+        ["editing", "writing"], ";polish"),
+      mk(writingId, "Professional email reply",
+        "Write a polite, professional reply to the message above. Keep it concise, warm, and clear.",
+        ["email"], ";email"),
+      mk(codingId, "Explain this code",
+        "Explain what the code below does, step by step, as if teaching a junior developer.",
+        ["explain", "code review"], ";explain"),
+      mk(codingId, "Find the bug",
+        "Find and fix the bug in the code below. Explain what was wrong and why.",
+        ["debugging"], ";bug"),
+      mk(codingId, "Add comments",
+        "Add clear, concise comments to the code below explaining what each part does.",
+        ["code review"], ";comment"),
+      mk(everydayId, "TL;DR summary",
+        "Summarize the key points below in 3 short bullet points.",
+        ["summary"], ";tldr"),
+      mk(everydayId, "Brainstorm ideas",
+        "Give me 10 creative ideas for the following, ranked from safe to bold:",
+        ["ideas"], ";ideas"),
+      mk(everydayId, "Rewrite in a set tone (Pro example)",
+        "Rewrite the text below in a {{tone}} tone.",
+        ["editing"], ";tone"),
     ];
 
     await storageSet({
