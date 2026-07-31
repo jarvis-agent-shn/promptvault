@@ -228,6 +228,7 @@
       getSettings(),
     ]);
     return {
+      schema: "promptvault.export",
       version: 1,
       exportedAt: nowIso(),
       folders,

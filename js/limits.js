@@ -23,7 +23,7 @@
     title: "Upgrade to PromptVault Pro",
     body:
       "Pro unlocks unlimited snippets, {{template}} variables, custom " +
-      "quick-search shortcuts, JSON import/export, and (coming soon) cloud " +
+      "quick-search shortcuts, and (coming soon) cloud " +
       "sync across devices.",
   };
 
@@ -54,8 +54,11 @@
     switch (feature) {
       case FEATURES.VARIABLES:
       case FEATURES.CUSTOM_TRIGGERS:
-      case FEATURES.IMPORT_EXPORT:
         return false;
+      // Import/export is intentionally FREE: nobody should move a real
+      // library into a tool they can't get their data back out of.
+      case FEATURES.IMPORT_EXPORT:
+        return true;
       default:
         return true;
     }
